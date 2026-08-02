@@ -5,7 +5,7 @@ async function embedQuery(query) {
     model: config.EMBEDDING_MODEL,
     contents: query,
   });
-  return response.embeddings[0].values;
+  return response.embedding?.values || response.embeddings?.[0]?.values;
 }
 
 async function searchDocuments(query, limit = config.SEARCH_LIMIT) {

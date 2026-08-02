@@ -8,8 +8,8 @@ const config = {
   QDRANT_URL: process.env.QDRANT_URL,
   QDRANT_API_KEY: process.env.QDRANT_API_KEY,
   QDRANT_COLLECTION: process.env.QDRANT_COLLECTION || 'pdf_chunks',
-  EMBEDDING_MODEL: 'gemini-embedding-001',
-  GENERATION_MODEL: 'gemini-2.0-flash',
+  EMBEDDING_MODEL: 'models/gemini-embedding-001',
+  GENERATION_MODEL: 'models/gemini-2.0-flash',
   CHUNK_SIZE: 800,
   CHUNK_OVERLAP: 150,
   VECTOR_DIM: 768,
@@ -29,6 +29,7 @@ try {
   qdrantClient = new QdrantClient({
     url: config.QDRANT_URL,
     apiKey: config.QDRANT_API_KEY,
+    checkCompatibility: false,
   });
 } catch (error) {
   console.error("Failed to initialize QdrantClient. Ensure QDRANT_URL is set.");

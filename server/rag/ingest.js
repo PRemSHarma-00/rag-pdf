@@ -84,9 +84,7 @@ async function embedTexts(texts) {
           model: config.EMBEDDING_MODEL,
           contents: text,
         });
-        // Assuming values might be directly accessible or via embeddings array depending on genai response structure.
-        // Based on typical schema for Google GenAI:
-        const values = response.embeddings[0].values;
+        const values = response.embedding?.values || response.embeddings?.[0]?.values;
         embeddings.push(values);
         success = true;
       } catch (error) {

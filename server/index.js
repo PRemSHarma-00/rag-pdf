@@ -24,17 +24,11 @@ app.use((err, req, res, next) => {
 });
 
 async function startServer() {
-  try {
+  app.listen(config.PORT, () => {
+    console.log(`Server listening on port ${config.PORT}`);
     console.log("Initializing Qdrant collection...");
-    await ensureCollection();
-    
-    app.listen(config.PORT, () => {
-      console.log(`Server listening on port ${config.PORT}`);
-    });
-  } catch (error) {
-    console.error("Failed to start server:", error);
-    process.exit(1);
-  }
+    ensureCollection().catch(err => console.error("Async collection initialization failed:", err));
+  });
 }
 
 startServer();
