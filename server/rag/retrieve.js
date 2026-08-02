@@ -1,4 +1,5 @@
-const { config, genai, qdrantClient } = require('../config');
+const { config, genai } = require('../config');
+const { searchPoints } = require('./vectorStore');
 
 async function embedQuery(query) {
   const response = await genai.models.embedContent({
@@ -11,22 +12,9 @@ async function embedQuery(query) {
 async function searchDocuments(query, limit = config.SEARCH_LIMIT) {
   console.log(`Searching for: "${query}"`);
   const queryVector = await embedQuery(query);
-  
-  const searchResults = await qdrantClient.search(config.QDRANT_COLLECTION, {
-    vector: queryVector,
-    limit: limit,
-    with_payload: true,
-  });
-  
-  console.log(`Found ${searchResults.length} results`);
-  
-  return searchResults.map(result => ({
-    text_content: result.payload.text_content,
-    page_number: result.payload.page_number,
-    filename: result.payload.filename,
-    score: result.score,
-    document_id: result.payload.document_id
-  }));
+  const results = await searchPoints(queryVector, limit);
+  console.log(`Found ${results.length} results`);
+  return results;
 }
 
 module.exports = { embedQuery, searchDocuments };

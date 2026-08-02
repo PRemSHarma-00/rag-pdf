@@ -1,6 +1,7 @@
 const pdfParse = require('pdf-parse');
 const { v4: uuidv4 } = require('uuid');
-const { config, genai, qdrantClient } = require('../config');
+const { config, genai } = require('../config');
+const { upsertPoints, deleteDocument } = require('./vectorStore');
 
 async function ensureCollection() {
   try {
@@ -164,15 +165,7 @@ async function ingestPDF(buffer, filename) {
     }
   }
 
-  const batchSize = 100;
-  for (let i = 0; i < allPoints.length; i += batchSize) {
-    const batch = allPoints.slice(i, i + batchSize);
-    await qdrantClient.upsert(config.QDRANT_COLLECTION, {
-      wait: true,
-      points: batch
-    });
-    console.log(`Upserted batch ${Math.floor(i / batchSize) + 1} (${batch.length} points)`);
-  }
+  await upsertPoints(allPoints);
 
   console.log(`Successfully ingested ${filename}: ${totalChunks} chunks across ${pageCounter - 1} pages`);
   return { docId, filename, chunks: totalChunks, pages: pageCounter - 1 };
@@ -180,19 +173,7 @@ async function ingestPDF(buffer, filename) {
 
 async function deleteDocumentVectors(docId) {
   console.log(`Deleting vectors for document: ${docId}`);
-  await qdrantClient.delete(config.QDRANT_COLLECTION, {
-    wait: true,
-    filter: {
-      must: [
-        {
-          key: 'document_id',
-          match: {
-            value: docId
-          }
-        }
-      ]
-    }
-  });
+  await deleteDocument(docId);
   console.log(`Successfully deleted vectors for ${docId}`);
 }
 

@@ -11,6 +11,8 @@ const upload = multer({
   limits: { fileSize: 50 * 1024 * 1024 } // 50MB
 });
 
+const { listDocuments } = require('../rag/vectorStore');
+
 router.post('/upload', upload.single('file'), async (req, res) => {
   try {
     if (!req.file) {
@@ -26,30 +28,17 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     res.json({ success: true, document: { id: result.docId, filename: result.filename, chunks: result.chunks, pages: result.pages } });
   } catch (error) {
     console.error("Error in /upload:", error);
-    res.status(500).json({ error: 'Failed to process PDF' });
+    res.status(500).json({ error: error.message || 'Failed to process PDF' });
   }
 });
 
 router.get('/documents', async (req, res) => {
   try {
-    const response = await qdrantClient.scroll(config.QDRANT_COLLECTION, {
-      limit: 10000,
-      with_payload: ['document_id', 'filename'],
-      with_vector: false,
-    });
-    
-    const docMap = new Map();
-    for (const point of response.points) {
-      if (point.payload && point.payload.document_id) {
-        docMap.set(point.payload.document_id, point.payload.filename);
-      }
-    }
-    
-    const documents = Array.from(docMap.entries()).map(([id, filename]) => ({ id, filename }));
+    const documents = await listDocuments();
     res.json({ documents });
   } catch (error) {
     console.error("Error in /documents:", error);
-    res.status(500).json({ error: 'Failed to fetch documents' });
+    res.status(500).json({ error: error.message || 'Failed to fetch documents' });
   }
 });
 
