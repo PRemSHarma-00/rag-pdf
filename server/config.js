@@ -9,7 +9,7 @@ const config = {
   QDRANT_API_KEY: process.env.QDRANT_API_KEY,
   QDRANT_COLLECTION: process.env.QDRANT_COLLECTION || 'pdf_chunks',
   EMBEDDING_MODEL: 'models/gemini-embedding-001',
-  GENERATION_MODEL: 'models/gemini-2.0-flash',
+  GENERATION_MODEL: 'models/gemini-flash-latest',
   CHUNK_SIZE: 800,
   CHUNK_OVERLAP: 150,
   VECTOR_DIM: 768,
