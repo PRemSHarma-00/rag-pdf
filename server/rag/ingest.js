@@ -1,6 +1,6 @@
 const pdfParse = require('pdf-parse');
 const { v4: uuidv4 } = require('uuid');
-const { config, genai } = require('../config');
+const { config, genai, qdrantClient } = require('../config');
 const { upsertPoints, deleteDocument } = require('./vectorStore');
 
 async function ensureCollection() {
